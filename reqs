@@ -1,0 +1,8 @@
+tinyetl
+=======
+
+* based on fabric
+* dry_run!
+* config file
+    * calculates log file location
+    * 
