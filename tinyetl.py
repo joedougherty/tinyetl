@@ -1,12 +1,47 @@
 from functools import wraps
 import sys
 import os
-from ConfigParser import SafeConfigParser, NoOptionError
 from datetime import datetime
 import logging
 
 class TinyETL:
-    def __init__(self, name, env):
+    """Manages facts about an ETL Process.
+
+    Provides a consistent interface for storing log location,
+    temporary data locations, and a way to facilitate dry-run
+    and logging on Fabric-based ETL scripts.
+
+    USAGE:
+    =====
+
+    etl = TinyETL(
+        'an_etl_job',
+        env=env, # This `env` will be provided by Fabric. [from fabric.api import env]
+        log_dir="/path/to/a/log/directory",
+        tmpdata_dir="/path/to/tmpdata/directory"
+    )
+
+    Instantiating this object will alter the behavior of your fabfile.
+    Specifically, fab will require you to set the `dry_run` parameter explicitly
+    if you'll be invoking a task.
+
+    `fab --list` will work as expected.
+    `fab main_task` will complain that `dry_run` has not be explicitly set.
+
+    INVOCATION:
+    ==========
+
+    `fab main_task --set dry_run=True`
+
+    LOG DECORATOR:
+    =============
+
+    This also provides a decorator for any tasks you want to log. 
+    Apply `@etl.log` as the innermost decorator to a task and it 
+    will be logged.
+
+    """
+    def __init__(self, name, env, log_dir=None, tmpdata_dir=None):
         """
         name [str] -> Pass in a string identifier for this task.
         env [env object] -> Pass in the env object provided by Fabric.
@@ -18,12 +53,19 @@ class TinyETL:
 
         self.name = name
         self.dry_run = self._this_is_a_dry_run(env)
-        self.config = self._parse_config(env)
         
         if not self.dry_run:
-            self.logdir = self.config.get('etlconfig', 'logdir')
+            if not os.path.exists(log_dir):
+                raise SystemExit("{} does not exist. Please create the log directory.".format(log_dir))
+            else:
+                self.log_dir = log_dir
+
+            if not os.path.exists(tmpdata_dir):
+                raise SystemExit("{} does not exist. Please create the tmp data directory.".format(log_dir))
+            else:
+                self.tmpdata_dir = tmpdata_dir
             self.logname = "{}_{}".format(self.name, datetime.now().strftime('%Y-%m-%d_%H:%M:%S')) 
-            self.logfile = os.path.join(self.logdir, self.logname + '.log')
+            self.logfile = os.path.join(self.log_dir, self.logname + '.log')
             self.logger = self._create_logger()
 
     def _this_is_a_dry_run(self, env):
@@ -38,40 +80,6 @@ class TinyETL:
         else:
             # Convert the passed-in string val to a bool before returning
             return {'True': True, 'False': False}.get(dry_run)
-
-    def _parse_config(self, env):
-        """ Parses the config file passed in by `--set config=</path/to/some/file>` """
-        try:
-            config_file = env.config
-        except AttributeError:
-            raise SystemExit("Please provide a config file location to config.")
-
-        # Make sure the file exists 
-        if os.path.exists(config_file):
-            return self._verify_config_file(config_file)
-        else:
-            raise SystemExit("Please ensure a config file exists at: ".format(config_file))
-
-    def _verify_config_file(self, config_file):
-        """ Ensure that all required sections are present in the config file. """
-        parser = SafeConfigParser()
-        parser.read(config_file)
-
-        required_attributes = ['logdir',]
-        err = ''
-        for attr in required_attributes:
-            try:
-                parser.get('etlconfig', attr)
-            except NoOptionError:
-                err += "Please set the {} attribute in the config file.\n".format(attr)
-   
-        if not err == '':
-            raise SystemExit(err)
-        else:
-            return parser
-
-    def _timestamp(self):
-        return datetime.now().strftime('%Y-%m-%d :: %H:%M:%S')
 
     def _create_logger(self):
         # See https://wingware.com/psupport/python-manual/2.3/lib/node304.html
