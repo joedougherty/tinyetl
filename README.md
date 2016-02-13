@@ -1,5 +1,5 @@
 ## tinyETL ##
 
-A lightweight, [fabric]-based (http://fabfile.org/) template for managing ETL tasks.
+A lightweight template for managing ETL tasks built around [fabric](http://fabfile.org).
 
 See the `TinyETL` class docstring for details.
