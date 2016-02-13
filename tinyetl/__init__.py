@@ -45,7 +45,8 @@ class TinyETL:
         """
         name [str] -> String identifier for this task.
         env [env object] -> The env object provided by Fabric.
-        log_dir [absolute path] (optional) -> 
+        log_dir [str] (optional) -> Absolute path to the directory to store logs in.
+        tmpdata_dir [str] (optional) ->  Absolute path to the directory to store temp data in.
         """
         # If there are no tasks to be run at invocation, 
         # don't bother with the rest of the object __init__
