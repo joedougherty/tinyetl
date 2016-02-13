@@ -21,7 +21,7 @@ class TinyETL:
         tmpdata_dir="/path/to/tmpdata/directory"
     )
 
-    Instantiating this object will alter the behavior of your fabfile.
+    Instantiating this object will alter the behavior of your fabfile.py.
     Specifically, fab will require you to set the `dry_run` parameter explicitly
     if you'll be invoking a task.
 
@@ -39,12 +39,13 @@ class TinyETL:
     This also provides a decorator for any tasks you want to log. 
     Apply `@etl.log` as the innermost decorator to a task and it 
     will be logged.
-
     """
+
     def __init__(self, name, env, log_dir=None, tmpdata_dir=None):
         """
-        name [str] -> Pass in a string identifier for this task.
-        env [env object] -> Pass in the env object provided by Fabric.
+        name [str] -> String identifier for this task.
+        env [env object] -> The env object provided by Fabric.
+        log_dir [absolute path] (optional) -> 
         """
         # If there are no tasks to be run at invocation, 
         # don't bother with the rest of the object __init__
@@ -95,9 +96,9 @@ class TinyETL:
         @wraps(f)
         def logwrapper(*args, **kwargs):
             if self.dry_run:
-                print('I would have run {} if this were the real deal!'.format(f.__name__))
+                print('[DRY RUN] :: {}'.format(f.__name__))
             else:
-                self.logger.info("Call {}".format(f.__name__))
+                self.logger.info("Running {}".format(f.__name__))
                 return f(*args, **kwargs)
         return logwrapper
 

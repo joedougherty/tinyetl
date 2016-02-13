@@ -2,3 +2,7 @@
 *.log
 logs/*.*
 __pycache__/*
+reqs
+build/
+dist/
+tinyetl.egg-info/
