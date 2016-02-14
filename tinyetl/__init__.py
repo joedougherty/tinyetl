@@ -105,7 +105,7 @@ class TinyETL:
             if self.dry_run:
                 print('[DRY RUN] :: {}'.format(f.__name__))
             else:
-                current_info = "Running {}".format(f.__name__))
+                current_info = "Running {}".format(f.__name__)
                 print(current_info)
                 self.logger.info(current_info)
                 return f(*args, **kwargs)
