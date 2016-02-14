@@ -56,6 +56,7 @@ class TinyETL:
         if env.tasks == []:
             return
 
+        self.name = name
         self.long_desc = long_desc
         self.dry_run = self._this_is_a_dry_run(env)
         
