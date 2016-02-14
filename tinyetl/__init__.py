@@ -115,5 +115,5 @@ class TinyETL:
         if r.status_code != 200:
             self.logger.error("Attempt to download {} failed with code {}.".format(endpoint, r.status_code))
         else:   
-            with open(file_to_write_to) as f:
+            with open(file_to_write_to, "wb") as f:
                 f.write(r.content)
