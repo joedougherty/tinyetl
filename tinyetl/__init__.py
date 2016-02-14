@@ -59,32 +59,34 @@ class TinyETL:
         self.name = name
         self.long_desc = long_desc
         self.dry_run = self._this_is_a_dry_run(env)
-        
-        if not self.dry_run:
-            if not os.path.exists(log_dir):
-                raise SystemExit("{} does not exist. Please create the log directory.".format(log_dir))
-            else:
-                self.log_dir = log_dir
 
-            if not os.path.exists(tmpdata_dir):
-                raise SystemExit("{} does not exist. Please create the tmp data directory.".format(log_dir))
-            else:
-                self.tmpdata_dir = tmpdata_dir
-            self.logname = "{}_{}".format(self.name, datetime.now().strftime('%Y-%m-%d_%H:%M:%S')) 
-            self.logfile = os.path.join(self.log_dir, self.logname + '.log')
-            self.logger = self._create_logger()
+        if not os.path.exists(log_dir):
+            raise SystemExit("{} does not exist. Please create the log directory.".format(log_dir))
         else:
-            print(self.long_desc)
+            self.log_dir = log_dir
+
+        if not os.path.exists(tmpdata_dir):
+            raise SystemExit("{} does not exist. Please create the tmp data directory.".format(log_dir))
+        else:
+            self.tmpdata_dir = tmpdata_dir
+        self.logname = "{}_{}".format(self.name, datetime.now().strftime('%Y-%m-%d_%H:%M:%S')) 
+        self.logfile = os.path.join(self.log_dir, self.logname + '.log')
+        self.logger = self._create_logger()
+
+    def usage(self):
+        msg = "Please provide either 'True' or 'False' to dry_run.\n"
+        msg += "Usage: fab <tasks> --set dry_run=[True|False]"
+        raise SystemExit(msg)
 
     def _this_is_a_dry_run(self, env):
         """ Determines if this is a dry run. """
         try:
             dry_run = env.dry_run
         except AttributeError:
-            raise SystemExit("Please provide either 'True' or 'False' to dry_run.")
+            self.usage()
 
         if dry_run not in ('True', 'False'):
-            raise SystemExit("Please provide either 'True' or 'False' to dry_run.")
+            self.usage()
         else:
             # Convert the passed-in string val to a bool before returning
             return {'True': True, 'False': False}.get(dry_run)
