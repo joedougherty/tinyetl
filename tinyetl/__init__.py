@@ -17,6 +17,7 @@ class TinyETL:
 
     etl = TinyETL(
         'an_etl_job',
+        long_desc,
         env=env, # This `env` will be provided by Fabric. [from fabric.api import env]
         log_dir="/path/to/a/log/directory",
         tmpdata_dir="/path/to/tmpdata/directory"
@@ -42,9 +43,10 @@ class TinyETL:
     will be logged.
     """
 
-    def __init__(self, desc, env, log_dir=None, tmpdata_dir=None):
+    def __init__(self, name, long_desc, env, log_dir=None, tmpdata_dir=None):
         """
-        desc [str] -> Docstring description of this task.
+        name [str] -> Short name to ETL task. Used in creating logfile names.
+        long_desc [str] -> Docstring description of this task.
         env [env object] -> The env object provided by Fabric.
         log_dir [str] (optional) -> Absolute path to the directory to store logs in.
         tmpdata_dir [str] (optional) ->  Absolute path to the directory to store temp data in.
@@ -54,7 +56,7 @@ class TinyETL:
         if env.tasks == []:
             return
 
-        self.desc = desc
+        self.long_desc = long_desc
         self.dry_run = self._this_is_a_dry_run(env)
         
         if not self.dry_run:
@@ -71,7 +73,7 @@ class TinyETL:
             self.logfile = os.path.join(self.log_dir, self.logname + '.log')
             self.logger = self._create_logger()
         else:
-            print(self.desc)
+            print(self.long_desc)
 
     def _this_is_a_dry_run(self, env):
         """ Determines if this is a dry run. """
