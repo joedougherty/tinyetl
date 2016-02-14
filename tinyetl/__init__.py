@@ -3,6 +3,7 @@ import sys
 import os
 from datetime import datetime
 import logging
+import requests
 
 class TinyETL:
     """Manages facts about an ETL Process.
@@ -41,9 +42,9 @@ class TinyETL:
     will be logged.
     """
 
-    def __init__(self, name, env, log_dir=None, tmpdata_dir=None):
+    def __init__(self, desc, env, log_dir=None, tmpdata_dir=None):
         """
-        name [str] -> String identifier for this task.
+        desc [str] -> Docstring description of this task.
         env [env object] -> The env object provided by Fabric.
         log_dir [str] (optional) -> Absolute path to the directory to store logs in.
         tmpdata_dir [str] (optional) ->  Absolute path to the directory to store temp data in.
@@ -53,7 +54,7 @@ class TinyETL:
         if env.tasks == []:
             return
 
-        self.name = name
+        self.desc = desc
         self.dry_run = self._this_is_a_dry_run(env)
         
         if not self.dry_run:
@@ -69,6 +70,8 @@ class TinyETL:
             self.logname = "{}_{}".format(self.name, datetime.now().strftime('%Y-%m-%d_%H:%M:%S')) 
             self.logfile = os.path.join(self.log_dir, self.logname + '.log')
             self.logger = self._create_logger()
+        else:
+            print(self.desc)
 
     def _this_is_a_dry_run(self, env):
         """ Determines if this is a dry run. """
@@ -102,4 +105,15 @@ class TinyETL:
                 self.logger.info("Running {}".format(f.__name__))
                 return f(*args, **kwargs)
         return logwrapper
+    
+    def timestamp(self):
+        return datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
 
+    def download_file(self, endpoint, file_to_write_to):
+        r = requests.get(endpoint)
+
+        if r.status_code != 200:
+            self.logger.error("Attempt to download {} failed with code {}.".format(endpoint, r.status_code))
+        else:   
+            with open(file_to_write_to) as f:
+                f.write(r.content)
