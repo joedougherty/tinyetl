@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
         name="tinyetl",
-        version='0.0.2',
+        version='0.0.3',
         description="Just a tiny bit of ETL",
         author="Joe Dougherty",
         author_email="joseph.dougherty@gmail.com",

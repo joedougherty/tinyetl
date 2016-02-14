@@ -43,13 +43,13 @@ class TinyETL:
     will be logged.
     """
 
-    def __init__(self, name, long_desc, env, log_dir=None, tmpdata_dir=None):
+    def __init__(self, name, long_desc, env, log_dir, tmpdata_dir):
         """
         name [str] -> Short name to ETL task. Used in creating logfile names.
         long_desc [str] -> Docstring description of this task.
         env [env object] -> The env object provided by Fabric.
-        log_dir [str] (optional) -> Absolute path to the directory to store logs in.
-        tmpdata_dir [str] (optional) ->  Absolute path to the directory to store temp data in.
+        log_dir [str] -> Absolute path to the directory to store logs in.
+        tmpdata_dir [str] ->  Absolute path to the directory to store temp data in.
         """
         # If there are no tasks to be run at invocation, 
         # don't bother with the rest of the object __init__
