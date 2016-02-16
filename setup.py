@@ -5,10 +5,10 @@ except ImportError:
 
 setup(
         name="tinyetl",
-        version='0.0.3',
+        version='0.0.4',
         description="Just a tiny bit of ETL",
         author="Joe Dougherty",
         author_email="joseph.dougherty@gmail.com",
         packages=['tinyetl'],
-        install_requires=['fabric'],
-        )
+        install_requires=['fabric', 'requests'],
+    )
