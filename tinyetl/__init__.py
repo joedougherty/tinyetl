@@ -43,7 +43,7 @@ class TinyETL:
     will be logged.
     """
 
-    def __init__(self, name, long_desc, env, log_dir, tmpdata_dir):
+    def __init__(self, name, long_desc, env, log_dir, tmpdata_dir, **kwargs):
         """
         name [str] -> Short name to ETL task. Used in creating logfile names.
         long_desc [str] -> Docstring description of this task.
@@ -72,6 +72,11 @@ class TinyETL:
         self.logname = "{}_{}".format(self.name, datetime.now().strftime('%Y-%m-%d_%H:%M:%S')) 
         self.logfile = os.path.join(self.log_dir, self.logname + '.log')
         self.logger = self._create_logger()
+
+        # This allows the user to store relevant data on the
+        # object they've created, without needing to anticipate
+        # every possible type of value a user may want to store.
+        self.__dict__.update(kwargs)
 
     def usage(self):
         msg = "Please provide either 'True' or 'False' to dry_run.\n"
@@ -110,7 +115,13 @@ class TinyETL:
                 current_info = "Running {}".format(f.__name__)
                 print(current_info)
                 self.logger.info(current_info)
-                return f(*args, **kwargs)
+
+                # TODO capture a log traceback as well
+                try:
+                    return f(*args, **kwargs)
+                except Exception as e:
+                    self.logger.error(e)
+                    raise Exception(e)
         return logwrapper
     
     def timestamp(self):
@@ -124,3 +135,29 @@ class TinyETL:
         else:   
             with open(file_to_write_to, "wb") as f:
                 f.write(r.content)
+
+    def __str__(self):
+        info = """
+Standard Attributes:
+===================
+
+ETL Name: {}
+Long Description: {}
+
+Log location: {}
+Temp data location: {}
+        """.format(self.name, self.long_desc, self.log_dir, self.tmpdata_dir)
+
+        standard = ('name', 'long_desc', 'log_dir', 'tmpdata_dir', 'logger', 'dry_run')
+
+        user_defined_attrs = ""
+        for k, v in self.__dict__.iteritems():
+            if k not in standard:
+                user_defined_attrs += "{}: {}\n".format(k.title(), v)
+
+        if user_defined_attrs == "":
+            return info 
+        else:
+            user_defined_attrs = "\nUser-defined Attributes:\n" + "=======================\n\n" + user_defined_attrs
+            return info + user_defined_attrs
+
