@@ -110,17 +110,16 @@ class TinyETL:
         @wraps(f)
         def logwrapper(*args, **kwargs):
             if self.dry_run:
-                print('[DRY RUN] :: {}'.format(f.__name__))
+                print('[DRY RUN] :: {}()'.format(f.__name__))
             else:
                 current_info = "Running {}".format(f.__name__)
                 print(current_info)
                 self.logger.info(current_info)
 
-                # TODO capture a log traceback as well
                 try:
                     return f(*args, **kwargs)
                 except Exception as e:
-                    self.logger.error(e)
+                    self.logger.exception(e)
                     raise Exception(e)
         return logwrapper
     
