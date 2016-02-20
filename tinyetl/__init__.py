@@ -20,7 +20,9 @@ class TinyETL:
         long_desc,
         env=env, # This `env` will be provided by Fabric. [from fabric.api import env]
         log_dir="/path/to/a/log/directory",
-        tmpdata_dir="/path/to/tmpdata/directory"
+        tmpdata_dir="/path/to/tmpdata/directory",
+        # Optionally, Create additional runtime attributes here 
+        another_relevant_dir="path/to/relevant/dir"
     )
 
     Instantiating this object will alter the behavior of your fabfile.py.
