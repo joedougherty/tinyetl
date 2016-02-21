@@ -4,7 +4,6 @@ import os
 from datetime import datetime
 import logging
 import requests
-import traceback
 
 class TinyETL:
     """Manages facts about an ETL Process.
