@@ -72,9 +72,11 @@ class TinyETL:
             raise SystemExit("{} does not exist. Please create the tmp data directory.".format(log_dir))
         else:
             self.tmpdata_dir = tmpdata_dir
-        self.logname = "{}_{}".format(self.name, datetime.now().strftime('%Y-%m-%d_%H:%M:%S')) 
-        self.logfile = os.path.join(self.log_dir, self.logname + '.log')
-        self.logger = self._create_logger()
+
+        if not self.dry_run:
+            self.logname = "{}_{}".format(self.name, datetime.now().strftime('%Y-%m-%d_%H:%M:%S')) 
+            self.logfile = os.path.join(self.log_dir, self.logname + '.log')
+            self.logger = self._create_logger()
 
         # This allows the user to store relevant data on the
         # object they've created, without needing to anticipate
@@ -121,9 +123,9 @@ class TinyETL:
 
                 try:
                     return f(*args, **kwargs)
-                except Exception as e:
-                    self.logger.exception(traceback.format_exc())
-                    raise Exception(e)
+                except Exception:
+                    self.logger.exception("ETL Error")
+                    raise
 
         return logwrapper
     
