@@ -4,6 +4,7 @@ import os
 from datetime import datetime
 import logging
 import requests
+import traceback
 
 class TinyETL:
     """Manages facts about an ETL Process.
@@ -121,8 +122,9 @@ class TinyETL:
                 try:
                     return f(*args, **kwargs)
                 except Exception as e:
-                    self.logger.exception(e)
+                    self.logger.exception(traceback.format_exc())
                     raise Exception(e)
+
         return logwrapper
     
     def timestamp(self):
