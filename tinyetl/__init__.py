@@ -61,6 +61,8 @@ class TinyETL:
         self.name = name
         self.long_desc = long_desc
         self.dry_run = self._this_is_a_dry_run(env)
+        self.log_dir = log_dir
+        self.tmpdata_dir = tmpdata_dir
 
         if not self.dry_run:
             self.logname = "{}_{}".format(self.name, datetime.now().strftime('%Y-%m-%d_%H:%M:%S')) 
